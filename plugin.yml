@@ -1,0 +1,12 @@
+name: VoiceChat
+main: XPocketMC\VoiceChat\VoiceChatPlugin
+version: 1.0.0
+api: 5.0.0
+author: XPocketMC
+commands:
+  voicechat:
+    description: Toggle voice chat on/off
+    usage: /voicechat
+permissions:
+  voicechat.use:
+    default: true

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceChat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .voice-chat-container {
+            background-color: #fff;
+            padding: 28px;
+            border-radius: 1000px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .voice-chat-container h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+        .voice-chat-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .voice-chat-button:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="voice-chat-container">
+        <h1>Voice Chat Control</h1>
+        <button id="toggleVoiceChat" class="voice-chat-button">Enable Voice Chat</button>
+    </div>
+
+    <script>
+        let socket;
+        let audioContext;
+        let mediaStream;
+
+        function init() {
+            socket = new WebSocket("ws://localhost:8080");
+            socket.onmessage = function(event) {
+                let data = JSON.parse(event.data);
+                playAudio(data.player, data.audio);
+            };
+
+            document.getElementById("toggleVoiceChat").addEventListener("click", toggleVoiceChat);
+        }
+
+        async function toggleVoiceChat() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+                document.getElementById("toggleVoiceChat").innerText = "Enable Voice Chat";
+            } else {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                let source = audioContext.createMediaStreamSource(mediaStream);
+                let processor = audioContext.createScriptProcessor(1024, 1, 1);
+                source.connect(processor);
+                processor.connect(audioContext.destination);
+
+                processor.onaudioprocess = function(e) {
+                    let inputData = e.inputBuffer.getChannelData(0) || new Float32Array(1024);
+                    socket.send(JSON.stringify({ player: "PlayerName", audio: inputData }));
+                };
+
+                document.getElementById("toggleVoiceChat").innerText = "Disable Voice Chat";
+            }
+        }
+
+        function playAudio(playerName, audioData) {
+            let audio = new Audio();
+            audio.src = URL.createObjectURL(new Blob([audioData], { type: "audio/ogg; codecs=opus" }));
+
+            // Placeholder for getting player distance; you need actual logic to calculate distance
+            let distance = getPlayerDistance(playerName);
+
+            // Adjust volume based on distance
+            let volume = 1 - (distance / 100); // Example formula
+            if (volume < 0) volume = 0;
+
+            audio.volume = volume;
+            audio.play();
+        }
+
+        function getPlayerDistance(playerName) {
+            // You need to implement actual logic to calculate distance between players
+            // For now, returning a fixed value for demonstration
+            return 50; // Placeholder distance
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+    "name": "xpocketmc/voicechat",
+    "description": "VoiceChat plugin for PocketMine-MP",
+    "type": "pocketmine-plugin",
+    "require": {
+        "cboden/ratchet": "^0.4.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "XPocketMC\\VoiceChat\\": "src/"
+        }
+    }
+}
