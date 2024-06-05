@@ -16,14 +16,12 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use Ratchet\Server\IoServer;
 
-class Main extends PluginBase implements MessageComponentInterface, Listener {
+class VoiceChatPlugin extends PluginBase implements MessageComponentInterface, Listener {
 
     private $clients;
     private $enabledPlayers;
 
     public function onEnable(): void {
-        $this->getLogger()->info("Enabling VoiceChat Plugin...");
-
         $this->clients = new \SplObjectStorage;
         $this->enabledPlayers = new Config($this->getDataFolder() . "enabledPlayers.yml", Config::YAML);
 
@@ -54,7 +52,7 @@ class Main extends PluginBase implements MessageComponentInterface, Listener {
     }
 
     public function onDisable(): void {
-        $this->getLogger()->info("Disabling VoiceChat Plugin...");
+        $this->getLogger()->info("VoiceChat Plugin Disabled!");
     }
 
     public function onOpen(ConnectionInterface $conn) {
