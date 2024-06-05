@@ -1,7 +1,7 @@
 name: VoiceChat
 main: XPocketMC\VoiceChat\VoiceChatPlugin
 version: 1.0.0
-api: 5.0.0
+api: 3.0.0
 author: XPocketMC
 commands:
   voicechat:
