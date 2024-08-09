@@ -37,23 +37,17 @@ class VoiceChatPlugin extends PluginBase implements MessageComponentInterface, L
         $this->getServer()->getScheduler()->scheduleRepeatingTask(new class($server) extends \pocketmine\scheduler\Task {
             private $server;
 
-            public function __construct($server) : void {
-                $this->server = $server;
-            }
-
             public function onRun(): void {
                 $this->server->loop->tick();
             }
         }, 1);
 
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
-
-        $this->getLogger()->info("VoiceChat Plugin Enabled!");
     }
 
-    public function onDisable(): void {
-        $this->getLogger()->info("VoiceChat Plugin Disabled!");
-    }
+public function __construct($server) : void {
+                $this->server = $server;
+}
 
     public function onOpen(ConnectionInterface $conn) {
         $this->clients->attach($conn);
