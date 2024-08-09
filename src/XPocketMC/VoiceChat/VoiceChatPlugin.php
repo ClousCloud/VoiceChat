@@ -45,7 +45,7 @@ class VoiceChatPlugin extends PluginBase implements MessageComponentInterface, L
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
-public function __construct($server) : void {
+public function __construct($server) {
                 $this->server = $server;
 }
 
