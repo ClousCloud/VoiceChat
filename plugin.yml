@@ -6,7 +6,7 @@ author: XPocketMC
 commands:
   voicechat:
     description: Toggle voice chat on/off
-    usage: /voicechat
+    permission: voicechat.use
 permissions:
   voicechat.use:
     default: true
