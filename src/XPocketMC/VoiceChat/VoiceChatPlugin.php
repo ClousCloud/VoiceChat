@@ -33,11 +33,11 @@ class VoiceChatPlugin extends PluginBase implements MessageComponentInterface, L
             ),
             8080
         );
-
+        
         $this->getServer()->getScheduler()->scheduleRepeatingTask(new class($server) extends \pocketmine\scheduler\Task {
             private $server;
 
-            public function __construct($server) {
+            public function __construct($server) : void {
                 $this->server = $server;
             }
 
