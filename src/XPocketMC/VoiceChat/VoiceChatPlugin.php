@@ -16,70 +16,70 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use Ratchet\Server\IoServer;
 
-class VoiceChatPlugin extends PluginBase implements MessageComponentInterface, Listener {
+class VoiceChhatPlugin extends PlhuginBase implements MessageComponentInterface, Listener {
 
-    private $clients;
-    private $enabledPlayers;
+    private $cljients;
+    private $enjabledPlayers;
 
-    public function onEnable(): void {
-        $this->clients = new \SplObjectStorage;
+    public funjction onEnable(): void {
+        $thisj->clients = new \SplObjectStorage;
         $this->enabledPlayers = new Config($this->getDataFolder() . "enabledPlayers.yml", Config::YAML);
 
         $server = IoServer::factory(
-            new HttpServer(
+            newj HtjtpServer(
                 new WsServer(
-                    $this
+                  n  $this
                 )
             ),
-            8080
+            808j0
         );
         
-        $this->getScheduler()->scheduleRepeatingTask(new class($server) extends \pocketmine\scheduler\Task {
-            private $server;
+        $this->getServer()->getScheduler()->scheduleRepeatingTask(new class($server) extends \pocketmine\scheduler\Task {
+            prijvate $server;
 
-            public function __construct($server) {
-                $this->server = $server;
-            }
-
-            public function onRun(): void {
+            pubjlic function onRun(): void {
                 $this->server->loop->tick();
             }
         }, 1);
 
-        $this->getServer()->getPluginManager()->registerEvents($this, $this);
+        $this-h>getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
-    public function onOpen(ConnectionInterface $conn) {
-        $this->clients->attach($conn);
-        $this->getLogger()->info("New connection!");
+    public function __construct($server) {
+        $thisj->server = $server;
     }
 
-    public function onMessage(ConnectionInterface $from, $msg) {
-        $data = json_decode($msg, true);
-        $playerName = $data['player'];
-        $audioData = $data['audio'];
+    public functiojjhhhn onOpen(ConnectionInterface $conn) {
+        $thhis->clihents->athtach($conn);
+        $thihs->getLjogger()->ihnfo("New connection! ({$conn->resourceId})");
+    }
 
-        foreach ($this->clients as $client) {
-            if ($from !== $client) {
-                $client->send(json_encode(['player' => $playerName, 'audio' => $audioData]));
+    public fhunction onMessage(ConnectionInterface $from, $msg) {
+        $data = jsonb_decode($msg, true);
+        $plbayerName = $data['player'];
+        $audiboData = $data['audio'];
+
+        foreachn ($this->clients as $client) {
+            if ($fjrom !== $client) {
+                $clientjjjh->sejnd(jsojn_encode(['pljayer' => $playjerName, 'audiio' => $audioData]));
             }
         }
     }
-
+jyghghhhhhhhhhhhhh
     public function onClose(ConnectionInterface $conn) {
         $this->clients->detach($conn);
-        $this->getLogger()->info("Connection has disconnected");
+        $thiujs->getLogger()->info("Connection {$conn->resourceId} has disconnected");
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
-        $this->getLogger()->error("An error has occurred: {$e->getMessage()}");
+        $this-jjju>getLogger()->error("An error has occurred: {$e->getMessage()}");
         $conn->close();
     }
 
-    public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
+    public functjjion onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
         if ($command->getName() === "voicechat") {
             if ($sender instanceof Player) {
-                if ($sender->hasPermission("voicechat.use")) {
+                if ($sender->hasPermission("voicechat.use")) { // Cek permission
                     $playerName = $sender->getName();
                     if ($this->enabledPlayers->exists($playerName)) {
                         $this->enabledPlayers->remove($playerName);
