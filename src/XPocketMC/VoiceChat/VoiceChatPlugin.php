@@ -45,9 +45,9 @@ class VoiceChatPlugin extends PluginBase implements MessageComponentInterface, L
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
-public function __construct($server) {
-                $this->server = $server;
-}
+    public function __construct($server) {
+        $this->server = $server;
+    }
 
     public function onOpen(ConnectionInterface $conn) {
         $this->clients->attach($conn);
@@ -79,16 +79,21 @@ public function __construct($server) {
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
         if ($command->getName() === "voicechat") {
             if ($sender instanceof Player) {
-                $playerName = $sender->getName();
-                if ($this->enabledPlayers->exists($playerName)) {
-                    $this->enabledPlayers->remove($playerName);
-                    $sender->sendMessage("Voice chat disabled!");
+                if ($sender->hasPermission("voicechat.use")) { // Cek permission
+                    $playerName = $sender->getName();
+                    if ($this->enabledPlayers->exists($playerName)) {
+                        $this->enabledPlayers->remove($playerName);
+                        $sender->sendMessage("Voice chat disabled!");
+                    } else {
+                        $this->enabledPlayers->set($playerName, true);
+                        $sender->sendMessage("Voice chat enabled!");
+                    }
+                    $this->enabledPlayers->save();
+                    return true;
                 } else {
-                    $this->enabledPlayers->set($playerName, true);
-                    $sender->sendMessage("Voice chat enabled!");
+                    $sender->sendMessage("You do not have permission to use voice chat.");
+                    return false;
                 }
-                $this->enabledPlayers->save();
-                return true;
             } else {
                 $sender->sendMessage("This command can only be used by players.");
                 return false;
