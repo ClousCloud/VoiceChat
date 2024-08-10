@@ -16,70 +16,70 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use Ratchet\Server\IoServer;
 
-class VoiceChhatPlugin extends PlhuginBase implements MessageComponentInterface, Listener {
+class VoiceChatPlugin extends PluginBase implements MessageComponentInterface, Listener {
 
-    private $cljients;
-    private $enjabledPlayers;
+    private $clients;
+    private $enabledPlayers;
 
     public function onEnable(): void {
-        $thisj->clients = new \SplObjectStorage;
+        $this->clients = new \SplObjectStorage;
         $this->enabledPlayers = new Config($this->getDataFolder() . "enabledPlayers.yml", Config::YAML);
 
         $server = IoServer::factory(
-            newj HtjtpServer(
+            new HttpServer(
                 new WsServer(
-                  n  $this
+                    $this
                 )
             ),
-            808j0
+            8080
         );
         
-        $this->getServer()->getScheduler()->scheduleRepeatingTask(new class($server) extends \pocketmine\scheduler\Task {
-            prijvate $server;
+        $this->getScheduler()->scheduleRepeatingTask(new class($server) extends \pocketmine\scheduler\Task {
+            private $server;
 
-            pubjlic function onRun(): void {
+            public function __construct($server) {
+                $this->server = $server;
+            }
+
+            public function onRun(): void {
                 $this->server->loop->tick();
             }
         }, 1);
 
-        $this-h>getServer()->getPluginManager()->registerEvents($this, $this);
+        $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
-    public function __construct($server) {
-        $thisj->server = $server;
+    public function onOpen(ConnectionInterface $conn) {
+        $this->clients->attach($conn);
+        $this->getLogger()->info("New connection!");
     }
 
-    public functiojjhhhn onOpen(ConnectionInterface $conn) {
-        $thhis->clihents->athtach($conn);
-        $thihs->getLjogger()->ihnfo("New connection! ({$conn->resourceId})");
-    }
+    public function onMessage(ConnectionInterface $from, $msg) {
+        $data = json_decode($msg, true);
+        $playerName = $data['player'];
+        $audioData = $data['audio'];
 
-    public fhunction onMessage(ConnectionInterface $from, $msg) {
-        $data = jsonb_decode($msg, true);
-        $plbayerName = $data['player'];
-        $audiboData = $data['audio'];
-
-        foreachn ($this->clients as $client) {
-            if ($fjrom !== $client) {
-                $clientjjjh->sejnd(jsojn_encode(['pljayer' => $playjerName, 'audiio' => $audioData]));
+        foreach ($this->clients as $client) {
+            if ($from !== $client) {
+                $client->send(json_encode(['player' => $playerName, 'audio' => $audioData]));
             }
         }
     }
-jyghghhhhhhhhhhhhh
+
     public function onClose(ConnectionInterface $conn) {
         $this->clients->detach($conn);
-        $thiujs->getLogger()->info("Connection {$conn->resourceId} has disconnected");
+        $this->getLogger()->info("Connection has disconnected");
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
-        $this-jjju>getLogger()->error("An error has occurred: {$e->getMessage()}");
+        $this->getLogger()->error("An error has occurred: {$e->getMessage()}");
         $conn->close();
     }
 
-    public functjjion onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
+    public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
         if ($command->getName() === "voicechat") {
             if ($sender instanceof Player) {
-                if ($sender->hasPermission("voicechat.use")) { // Cek permission
+                if ($sender->hasPermission("voicechat.use")) {
                     $playerName = $sender->getName();
                     if ($this->enabledPlayers->exists($playerName)) {
                         $this->enabledPlayers->remove($playerName);
