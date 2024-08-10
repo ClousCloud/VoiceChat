@@ -34,8 +34,12 @@ class VoiceChatPlugin extends PluginBase implements MessageComponentInterface, L
             8080
         );
         
-        $this->getServer()->getScheduler()->scheduleRepeatingTask(new class($server) extends \pocketmine\scheduler\Task {
+        $this->getScheduler()->scheduleRepeatingTask(new class($server) extends \pocketmine\scheduler\Task {
             private $server;
+
+            public function __construct($server) {
+                $this->server = $server;
+            }
 
             public function onRun(): void {
                 $this->server->loop->tick();
@@ -45,13 +49,9 @@ class VoiceChatPlugin extends PluginBase implements MessageComponentInterface, L
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
-    public function __construct($server) {
-        $this->server = $server;
-    }
-
     public function onOpen(ConnectionInterface $conn) {
         $this->clients->attach($conn);
-        $this->getLogger()->info("New connection! ({$conn->resourceId})");
+        $this->getLogger()->info("New connection!");
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
@@ -68,7 +68,7 @@ class VoiceChatPlugin extends PluginBase implements MessageComponentInterface, L
 
     public function onClose(ConnectionInterface $conn) {
         $this->clients->detach($conn);
-        $this->getLogger()->info("Connection {$conn->resourceId} has disconnected");
+        $this->getLogger()->info("Connection has disconnected");
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
@@ -79,7 +79,7 @@ class VoiceChatPlugin extends PluginBase implements MessageComponentInterface, L
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
         if ($command->getName() === "voicechat") {
             if ($sender instanceof Player) {
-                if ($sender->hasPermission("voicechat.use")) { // Cek permission
+                if ($sender->hasPermission("voicechat.use")) {
                     $playerName = $sender->getName();
                     if ($this->enabledPlayers->exists($playerName)) {
                         $this->enabledPlayers->remove($playerName);
