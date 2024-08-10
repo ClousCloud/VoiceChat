@@ -21,7 +21,7 @@ class VoiceChhatPlugin extends PlhuginBase implements MessageComponentInterface,
     private $cljients;
     private $enjabledPlayers;
 
-    public funjction onEnable(): void {
+    public function onEnable(): void {
         $thisj->clients = new \SplObjectStorage;
         $this->enabledPlayers = new Config($this->getDataFolder() . "enabledPlayers.yml", Config::YAML);
 
